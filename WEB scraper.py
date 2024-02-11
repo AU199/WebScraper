@@ -7,21 +7,34 @@ import string
 service = webdriver.ChromeService()
 options = webdriver.ChromeOptions()
 driver = webdriver.Chrome(service=service, options=options)
-
-
-websites_to_get = ['https://www.swimmeet.com/swdistrict24/mason/psych-sheets/boys-d1-100-freestyle.html', 'https://www.swimmeet.com/swdistrict24/mason/psych-sheets/boys-d1-50-freestyle.html']
+file = open("events.txt","r")
+events_to = []
+for line in file.readlines():
+    if line != "\n":
+        events_to.append(line)
+main_website = 'https://www.swimmeet.com/swdistrict24/mason/psych-sheets/boys-d1'
 players = []
 positions = []
 times = []
-event = []
+events = []
 
-for i in range(len(websites_to_get)):
-    print(i)
+for i in range(len(events_to)):
     light_green = []
     light_Tan = []
     School = "Cincinnati Sycamore"
+    event = events_to[i].split(' ')
+    fixed_event = ''
+    item_to_fix = event[1]
+    for i in range(len(event[1])):
+        if item_to_fix[i] in string.ascii_letters:
+            fixed_event += item_to_fix[i]
 
-    driver.get(websites_to_get[i])
+    event[1] = fixed_event
+    website = (main_website+'-'+f'{event[0]}'+'-'f'{event[1]}'+'.'+'html')
+
+
+
+    driver.get(website)
 
     content = driver.page_source
     soup = BeautifulSoup(content, features= "html.parser")
@@ -51,7 +64,7 @@ for i in range(len(websites_to_get)):
             players.append(player)
             positions.append(position)
             times.append(time)
-            event.append(event_name)
+            events.append(event_name)
 
 
     for element in light_tan:
@@ -67,8 +80,15 @@ for i in range(len(websites_to_get)):
             players.append(player)
             positions.append(position)
             times.append(time)
-            event.append(event_name)
+            events.append(event_name)
     print(event)
-print(len(players),len(positions),len(times),len(event))
-df = pd.DataFrame({'player': players, 'position': positions, 'time': times, 'event' : event} )
+players.append("\n")
+players.append("CREATOR: AKUL GUMUDAVALLI")
+
+for i in range(len(players)-len(positions)):
+    positions.append("")
+    times.append("")
+    events.append("")
+print(len(players),len(positions),len(times),len(events))
+df = pd.DataFrame({'player': players, 'position': positions, 'time': times, 'event' : events} )
 df.to_csv('players.csv',index=False, encoding= 'utf-8')

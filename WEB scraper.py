@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 import pandas as pd
+import string
 
 service = webdriver.ChromeService()
 options = webdriver.ChromeOptions()
@@ -24,7 +25,6 @@ for i in range(len(websites_to_get)):
 
     content = driver.page_source
     soup = BeautifulSoup(content, features= "html.parser")
-
     event_name_getter = soup.find('div', attrs= {'id':'eventName'})
     event_name = event_name_getter['value']
     print(event_name)

@@ -1,63 +1,94 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 import pandas as pd
+import string
 
 service = webdriver.ChromeService()
 options = webdriver.ChromeOptions()
 driver = webdriver.Chrome(service=service, options=options)
-
-light_green = []
-light_Tan = []
-School = "Cincinnati Sycamore"
+file = open("events.txt","r")
+events_to = []
+for line in file.readlines():
+    if line != "\n":
+        events_to.append(line)
+main_website = 'https://www.swimmeet.com/swdistrict24/mason/psych-sheets/boys-d1'
 players = []
 positions = []
 times = []
-driver.get('https://www.swimmeet.com/swdistrict24/mason/psych-sheets/boys-d1-50-freestyle.html')
+events = []
+
+for i in range(len(events_to)):
+    light_green = []
+    light_Tan = []
+    School = "Cincinnati Sycamore"
+    event = events_to[i].split(' ')
+    fixed_event = ''
+    item_to_fix = event[1]
+    for i in range(len(event[1])):
+        if item_to_fix[i] in string.ascii_letters:
+            fixed_event += item_to_fix[i]
+
+    event[1] = fixed_event
+    website = (main_website+'-'+f'{event[0]}'+'-'f'{event[1]}'+'.'+'html')
 
 
-content = driver.page_source
-soup = BeautifulSoup(content, features= "html.parser")
-for element in soup.findAll('div', attrs= {'id': 'results'}):
-    light_green_items = element.find_all('tr', attrs = {'class':"lightGreen"})
-    light_tan_item = element.find_all('tr', attrs = {'class':"lightTan"})
+
+    driver.get(website)
+
+    content = driver.page_source
+    soup = BeautifulSoup(content, features= "html.parser")
+    event_name_getter = soup.find('div', attrs= {'id':'eventName'})
+    event_name = event_name_getter['value']
+    print(event_name)
+    
+    for element in soup.findAll('div', attrs= {'id': 'results'}):
+        light_green_items = element.find_all('tr', attrs = {'class':"lightGreen"})
+        light_tan_item = element.find_all('tr', attrs = {'class':"lightTan"})
 
 
-    light_green = light_green_items
-    light_tan = light_tan_item
+        light_green = light_green_items
+        light_tan = light_tan_item
 
-for element in light_green:
+    for element in light_green:
 
 
-    player = element.find('td', attrs = {'class':"name"}).string
-    position = element.find('td', attrs = {'class':"rank"}).string
-    time = element.find('td', attrs = {'class': "time"}).string
-    team_d = element.find('td', class_='team')
-    team = ' '.join(team_d.stripped_strings)
+        player = element.find('td', attrs = {'class':"name"}).string
+        position = element.find('td', attrs = {'class':"rank"}).string
+        time = element.find('td', attrs = {'class': "time"}).string
+        team_d = element.find('td', class_='team')
+        team = ' '.join(team_d.stripped_strings)
 
-    if team == School:
+        if team == School:
         
-        print(player, position, time,team)
-        players.append(player)
-        positions.append(position)
-        times.append(time)
+            players.append(player)
+            positions.append(position)
+            times.append(time)
+            events.append(event_name)
 
 
-for element in light_tan:
+    for element in light_tan:
 
-    player = element.find('td', attrs = {'class':"name"}).string
-    position = element.find('td', attrs = {'class':"rank"}).string
-    time = element.find('td', attrs = {'class': "time"}).string
-    team_d = element.find('td', class_='team')
-    team = ' '.join(team_d.stripped_strings)
+        player = element.find('td', attrs = {'class':"name"}).string
+        position = element.find('td', attrs = {'class':"rank"}).string
+        time = element.find('td', attrs = {'class': "time"}).string
+        team_d = element.find('td', class_='team')
+        team = ' '.join(team_d.stripped_strings)
 
 
-    if team == School:
-        
-        print(player, position, time,team)
-        players.append(player)
-        positions.append(position)
-        times.append(time)
+        if team == School:
+            players.append(player)
+            positions.append(position)
+            times.append(time)
+            events.append(event_name)
+    print(event)
+players.append("\n")
+players.append("CREATOR: AKUL GUMUDAVALLI")
 
-df = pd.DataFrame({'player': players, 'position': positions, 'time': times} )
+for i in range(len(players)-len(positions)):
+    positions.append("")
+    times.append("")
+    events.append("")
+print(len(players),len(positions),len(times),len(events))
+df = pd.DataFrame({'player': players, 'position': positions, 'time': times, 'event' : events} )
 df.to_csv('players.csv',index=False, encoding= 'utf-8')

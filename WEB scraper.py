@@ -90,5 +90,5 @@ for i in range(len(players)-len(positions)):
     times.append("")
     events.append("")
 print(len(players),len(positions),len(times),len(events))
-df = pd.DataFrame({'player': players, 'position': positions, 'time': times, 'event' : events} )
-df.to_csv('players.csv',index=False, encoding= 'utf-8')
+data_frame = pd.DataFrame({'player': players, 'position': positions, 'time': times, 'event' : events} )
+data_frame.to_csv('players.csv',index=False, encoding= 'utf-8')

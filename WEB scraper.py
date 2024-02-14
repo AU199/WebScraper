@@ -12,7 +12,7 @@ events_to = []
 for line in file.readlines():
     if line != "\n":
         events_to.append(line)
-main_website = 'https://www.swimmeet.com/swdistrict24/mason/finals/boys-d1'
+main_website = 'https://www.swimmeet.com/swdistrict24/qualifiers/boys-d1'
 players = []
 positions = []
 times = []

@@ -22,7 +22,7 @@ our_players = []
 our_times = []
 
 def find(player):
-    color = 'red' if player in our_players and time in our_times else 'black'
+    color = 'red' if time in our_times else 'black'
     return 'color: %s' % color
 
 

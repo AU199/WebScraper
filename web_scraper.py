@@ -7,7 +7,7 @@ import string
 service = webdriver.ChromeService()
 options = webdriver.ChromeOptions()
 driver = webdriver.Chrome(service=service, options=options)
-file = open("events.txt","r")
+file = open("./events.txt","r")
 events_to = []
 for line in file.readlines():
     if line != "\n":
